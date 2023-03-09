@@ -1,1 +1,1 @@
-# distributed-genetic-algorithm
+# parallelized-genetic-algorithm
