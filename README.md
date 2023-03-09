@@ -11,3 +11,5 @@ The code has been written in Java. Below are instructions on how to run the code
 C:\Users> **javac \*.java**
 
 C:\Users> **java GeneticAlgorithm**
+
+*Note: currently the expected output is still a work in progress, thus these instructions have been provided for compilation sakes rather than verification of output.*
