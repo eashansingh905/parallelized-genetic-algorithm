@@ -21,7 +21,7 @@ public class Chromosome {
 		chromo = "";
 
 		// Generate a binary candidate solution of length 26
-		for (int i = 0; i < 26; i++)
+		for (int i = 0; i < 20; i++)
 		{
 			gene = Math.random() > 0.5 ? '0':'1';
 			this.chromo = chromo + gene;  
@@ -38,20 +38,109 @@ public class Chromosome {
 	// TODO: Mutation operation
 	public void mutation(){
 
+		String mutChromo = "";
+		char x;
+		double randnum;
+		int mutationType = 1;
+
+
+		switch (mutationType){
+
+		case 1:     //  Replace with new random number
+
+			for (int j=0; j<20; j++){
+				x = this.chromo.charAt(j);
+				randnum = Search.r.nextDouble();
+				if (randnum < 0.05){
+					if (x == '1') x = '0';
+					else x = '1';
+				}
+				mutChromo = mutChromo + x;
+			}
+			this.chromo = mutChromo;
+			break;
+
+		default:
+			System.out.println("ERROR - No mutation method selected");
+		}
+
 	}
 
 
 	/*********************************** Static methods ***********************************/
 
 	// TODO: Parent selection strategy
-	public static int selectionOfParent(){
-	
+	public static int selectionOfParent(){ //selectParent
+		
+		int tournamentType = 2;
+		double rWheel = 0;
+		double randnum;
+		int j = 0; 
+		int k = 0; 
+
+		switch(tournamentType){
+
+		case 1:
+			randnum = Search.r.nextDouble();
+			for (j=0; j<20; j++){
+				rWheel = rWheel + Search.member[j].fitness;
+				if (randnum < rWheel) return(j);
+			}
+			break;
+
+		case 2:
+			int tourneySize = 2;
+            double minFitness = Double.MAX_VALUE;
+            int bestMember = -1;
+
+            for (int i = 0; i < tourneySize; i++) {
+                randnum = Search.r.nextDouble();
+                int x = (int)(randnum * 20);
+                if (Search.member[x].fitness < minFitness) {
+                    minFitness = Search.member[x].fitness;
+                    bestMember = x;
+                }
+            }
+
+            return bestMember;
+
+         default:
+         		System.out.println("ERROR - No selection made for tournamentType.");
+		}
+
 		return -1; 
 	}
 
 	// TODO: Crossover operation
-	public void crossover(Chromosome parent1, Chromosome parent2, Chromosome child1, Chromosome child2){
-	
+	public static void crossover(Chromosome parent1, Chromosome parent2, Chromosome child1, Chromosome child2){
+		int xoverPoint1;
+		int xoverPoint2;
+
+		int crossoverType = 1; 
+
+		switch (crossoverType){
+
+		case 1:     //  Single Point Crossover
+
+			//  Select crossover point
+			xoverPoint1 = 1 + (int)(Search.r.nextDouble() * (19));
+
+			//  Create child chromosome from parental material
+			child1.chromo = parent1.chromo.substring(0,xoverPoint1) + parent2.chromo.substring(xoverPoint1);
+			child2.chromo = parent2.chromo.substring(0,xoverPoint1) + parent1.chromo.substring(xoverPoint1);
+			break;
+
+		case 2:     //  Two Point Crossover
+
+		case 3:     //  Uniform Crossover
+
+		default:
+			System.out.println("ERROR - Bad crossover method selected");
+		}
+
+		//  Set fitness values back to zero
+		child1.fitness = -1;   //  Fitness not yet evaluated
+		child2.fitness = -1;   //  Fitness not yet proportionalized
 	}
 
 	

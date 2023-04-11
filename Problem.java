@@ -26,11 +26,11 @@ class Problem {
 		System.out.println("Evaluating Fitness Function...");
 	}
 
-	// Print a candidate solution
-	public void printChromosome(Chromosome chromo)
-	{
-		System.out.println("Printing chromosome...");
-	}
+	// // Print a candidate solution
+	// public void printChromosome(Chromosome chromo, FileWriter output) throws java.io.IOException
+	// {
+	// 	System.out.println("Printing chromosome...");
+	// }
 
 
 }
