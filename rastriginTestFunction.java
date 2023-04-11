@@ -1,4 +1,4 @@
-public class test{
+public class rastriginTestFunction{
 
 	public static double calculateFitness(String s)
 	{

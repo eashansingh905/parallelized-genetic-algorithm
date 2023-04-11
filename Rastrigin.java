@@ -8,16 +8,11 @@ import java.text.*;
 
 public class Rastrigin extends Problem {
 
-
-	/*********************************** Constructors ***********************************/
 	public Rastrigin() {
 
 		problemName = "Rastrigin Function";
 	}
 
-
-	/*********************************** Class methods ***********************************/
-	
 	public void calculateFitness(Chromosome chromo)
 	{
 		double x1=0;
@@ -55,13 +50,5 @@ public class Rastrigin extends Problem {
 
 		chromo.fitness = rastrigin;
 	}
-
-	// public void printChromosome(Chromosome chromo, FileWriter output) throws java.io.IOException
-	// {
-	// 	for (int i = 0; i < 20; i++)
-	// 	{
-	// 		// Hwrite.right(chromo.)
-	// 	}
-	// }
 
 }
