@@ -7,7 +7,7 @@ import java.io.*;
 import java.util.*;
 import java.text.*;
 
-public class Search {
+public class Search{
 
 /*******************************************************************************
 *                           INSTANCE VARIABLES                                 *
@@ -61,25 +61,15 @@ public class Search {
 
 	private static final int GENERATIONS = 100;
 	private static final int RUNS = 100;
-	private static final int POP_SIZE = 20;
+	private static final int POP_SIZE = 1000;
 	private static final boolean MAX_OR_MIN = false; // true = Maximization problem; false = Minimization problem
 	private static final double XOVER_RATE = 0.8;
+	private static final int NUM_THREADS = 4;
+
+	
 
 	// private static double bestFitness[][]
 
-/*******************************************************************************
-*                              CONSTRUCTORS                                    *
-*******************************************************************************/
-
-
-/*******************************************************************************
-*                             MEMBER METHODS                                   *
-*******************************************************************************/
-
-
-/*******************************************************************************
-*                             STATIC METHODS                                   *
-*******************************************************************************/
 
 	public static void main(String[] args) throws java.io.IOException{
 
@@ -111,27 +101,10 @@ public class Search {
             }
         }
 
-	//	Problem Specific Setup - For new new fitness function problems, create
-	//	the appropriate class file (extending FitnessFunction.java) and add
-	//	an else_if block below to instantiate the problem.
- 
-		// if (Parameters.problemType.equals("NM")){
-		// 		problem = new NumberMatch();
-		// }
-		// else if (Parameters.problemType.equals("PS")){
-		// 		problem = new PointScattering();
-		// }
-		// else if (Parameters.problemType.equals("OM")){
-		// 		problem = new OneMax();
-		// }
-		// else System.out.println("Invalid Problem Type");
-
         problem = new Rastrigin();
         System.out.println("Optimization problem: " + problem.problemName);
 		// System.out.println(problem.name);
 
-	//	Initialize RNG, array sizes and other objects
-		// r.setSeed(Parameters.seed);
 		memberIndex = new int[POP_SIZE];
 		memberFitness = new double[POP_SIZE];
 		member = new Chromosome[POP_SIZE];
@@ -172,14 +145,46 @@ public class Search {
 				sumfitness2 = 0;
 				bestOfGenChromosome.fitness = defaultBest;
 
-				//	Test Fitness of Each Member
+
+				int blockSize = (int) (POP_SIZE/NUM_THREADS);
+				int total = 0; 
+				
+
+				List<MultithreadFitness> threads = new ArrayList<MultithreadFitness>();
+
+				for (int q = 0; q<NUM_THREADS; q++)
+				{
+					if(q!=NUM_THREADS-1)
+					{
+						MultithreadFitness myThing = new MultithreadFitness(problem, total,total+blockSize-1, POP_SIZE, member);
+						myThing.start();
+						threads.add(myThing);
+					}
+					else
+					{
+						MultithreadFitness myThing = new MultithreadFitness(problem, total, POP_SIZE-1, POP_SIZE, member);
+						myThing.start();
+						threads.add(myThing);
+					}
+					
+					total += blockSize; 
+				}
+
+				for (MultithreadFitness thread : threads)
+				{
+					try{
+						thread.join();
+					} catch (InterruptedException e){
+					}
+				}
+
 				for (int i=0; i<POP_SIZE; i++){
 
-					member[i].fitness = 0;
+					// member[i].fitness = 0;
 					// member[i].sclFitness = 0;
 					// member[i].proFitness = 0;
 
-					problem.calculateFitness(member[i]);
+					// problem.calculateFitness(member[i]);
 
 					sumfitness = sumfitness + member[i].fitness;
 					sumfitness2 = sumfitness2 +
@@ -261,100 +266,6 @@ public class Search {
 				summaryOutput.write("\n");
 
 
-		// // *********************************************************************
-		// // **************** SCALE FITNESS OF EACH MEMBER AND SUM ***************
-		// // *********************************************************************
-
-		// 		switch(Parameters.scaleType){
-
-		// 		case 0:     // No change to raw fitness
-		// 			for (int i=0; i<POP_SIZE; i++){
-		// 				member[i].sclFitness = member[i].fitness + .000001;
-		// 				sumSclFitness += member[i].sclFitness;
-		// 			}
-		// 			break;
-
-		// 		case 1:     // Fitness not scaled.  Only inverted.
-		// 			for (int i=0; i<POP_SIZE; i++){
-		// 				member[i].sclFitness = 1/(member[i].fitness + .000001);
-		// 				sumSclFitness += member[i].sclFitness;
-		// 			}
-		// 			break;
-
-		// 		case 2:     // Fitness scaled by Rank (Maximizing fitness)
-
-		// 			//  Copy genetic data to temp array
-		// 			for (int i=0; i<POP_SIZE; i++){
-		// 				memberIndex[i] = i;
-		// 				memberFitness[i] = member[i].fitness;
-		// 			}
-		// 			//  Bubble Sort the array by floating point number
-		// 			for (int i=POP_SIZE-1; i>0; i--){
-		// 				for (int j=0; j<i; j++){
-		// 					if (memberFitness[j] > memberFitness[j+1]){
-		// 						TmemberIndex = memberIndex[j];
-		// 						TmemberFitness = memberFitness[j];
-		// 						memberIndex[j] = memberIndex[j+1];
-		// 						memberFitness[j] = memberFitness[j+1];
-		// 						memberIndex[j+1] = TmemberIndex;
-		// 						memberFitness[j+1] = TmemberFitness;
-		// 					}
-		// 				}
-		// 			}
-		// 			//  Copy ordered array to scale fitness fields
-		// 			for (int i=0; i<POP_SIZE; i++){
-		// 				member[memberIndex[i]].sclFitness = i;
-		// 				sumSclFitness += member[memberIndex[i]].sclFitness;
-		// 			}
-
-		// 			break;
-
-		// 		case 3:     // Fitness scaled by Rank (minimizing fitness)
-
-		// 			//  Copy genetic data to temp array
-		// 			for (int i=0; i<POP_SIZE; i++){
-		// 				memberIndex[i] = i;
-		// 				memberFitness[i] = member[i].fitness;
-		// 			}
-		// 			//  Bubble Sort the array by floating point number
-		// 			for (int i=1; i<POP_SIZE; i++){
-		// 				for (int j=(POP_SIZE - 1); j>=i; j--){
-		// 					if (memberFitness[j-i] < memberFitness[j]){
-		// 						TmemberIndex = memberIndex[j-1];
-		// 						TmemberFitness = memberFitness[j-1];
-		// 						memberIndex[j-1] = memberIndex[j];
-		// 						memberFitness[j-1] = memberFitness[j];
-		// 						memberIndex[j] = TmemberIndex;
-		// 						memberFitness[j] = TmemberFitness;
-		// 					}
-		// 				}
-		// 			}
-		// 			//  Copy array order to scale fitness fields
-		// 			for (int i=0; i<POP_SIZE; i++){
-		// 				member[memberIndex[i]].sclFitness = i;
-		// 				sumSclFitness += member[memberIndex[i]].sclFitness;
-		// 			}
-
-		// 			break;
-
-		// 		default:
-		// 			System.out.println("ERROR - No scaling method selected");
-		// 		}
-
-
-		// // *********************************************************************
-		// // ****** PROPORTIONALIZE SCALED FITNESS FOR EACH MEMBER AND SUM *******
-		// // *********************************************************************
-
-		// 		for (int i=0; i<POP_SIZE; i++){
-		// 			member[i].proFitness = member[i].sclFitness/sumSclFitness;
-		// 			sumProFitness = sumProFitness + member[i].proFitness;
-		// 		}
-
-		// *********************************************************************
-		// ************ CROSSOVER AND CREATE NEXT GENERATION *******************
-		// *********************************************************************
-
 				int parent1 = -1;
 				int parent2 = -1;
 
@@ -405,25 +316,7 @@ public class Search {
 			System.out.println(R + "\t" + "B" + "\t"+ bestOfRunChromosome.fitness);
 			System.out.println(bestOfRunChromosome.chromo);
 
-		} //End of a Run
-
-		// for(int i = 0; i< GENERATIONS; i++)
-		// {
-		// 	// stdev average fitness
-  //           double sumAvgFitness = 0;
-  //           for (int j=1; j<=RUNS; j++){
-  //          	    sumAvgFitness += fitnessLog[j][i][0];
-  //          	}
-            	
-  //           double avgAvgFitness = sumAvgFitness / RUNS;
-  //           double stdevAvgFitness = 0;
-            	
-  //           for (int j=1; j<=RUNS; j++){
-  //               stdevAvgFitness += Math.pow(fitnessLog[j][i][0] - avgAvgFitness, 2);
-  //           }
-
-  //           stdevAvgFitness = Math.sqrt(stdevAvgFitness / RUNS);
-		// }
+		} 
 
 		Hwrite.left("B", 8, summaryOutput);
 

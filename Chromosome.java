@@ -20,7 +20,7 @@ public class Chromosome {
 		double rand; 
 		chromo = "";
 
-		// Generate a binary candidate solution of length 26
+		// Generate a binary candidate solution of length 20
 		for (int i = 0; i < 20; i++)
 		{
 			gene = Math.random() > 0.5 ? '0':'1';
@@ -34,11 +34,9 @@ public class Chromosome {
 
 	/*********************************** Class methods ***********************************/
 
-
-	// TODO: Mutation operation
 	public void mutation(){
 
-		String mutChromo = "";
+		String mutatedChromosome = "";
 		char x;
 		double randnum;
 		int mutationType = 1;
@@ -46,7 +44,7 @@ public class Chromosome {
 
 		switch (mutationType){
 
-		case 1:     //  Replace with new random number
+		case 1: 
 
 			for (int j=0; j<20; j++){
 				x = this.chromo.charAt(j);
@@ -55,13 +53,13 @@ public class Chromosome {
 					if (x == '1') x = '0';
 					else x = '1';
 				}
-				mutChromo = mutChromo + x;
+				mutatedChromosome = mutatedChromosome + x;
 			}
-			this.chromo = mutChromo;
+			this.chromo = mutatedChromosome;
 			break;
 
 		default:
-			System.out.println("ERROR - No mutation method selected");
+			System.out.println("ERROR");
 		}
 
 	}
@@ -82,7 +80,7 @@ public class Chromosome {
 
 		case 1:
 			randnum = Search.r.nextDouble();
-			for (j=0; j<20; j++){
+			for (j=0; j<1000; j++){
 				rWheel = rWheel + Search.member[j].fitness;
 				if (randnum < rWheel) return(j);
 			}
@@ -95,7 +93,7 @@ public class Chromosome {
 
             for (int i = 0; i < tourneySize; i++) {
                 randnum = Search.r.nextDouble();
-                int x = (int)(randnum * 20);
+                int x = (int)(randnum * 1000);
                 if (Search.member[x].fitness < minFitness) {
                     minFitness = Search.member[x].fitness;
                     bestMember = x;

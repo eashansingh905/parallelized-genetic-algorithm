@@ -18,7 +18,6 @@ public class Rastrigin extends Problem {
 
 	/*********************************** Class methods ***********************************/
 	
-	// TODO: Calculate the fitness of a candidate solution
 	public void calculateFitness(Chromosome chromo)
 	{
 		double x1=0;
